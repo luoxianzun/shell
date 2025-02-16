@@ -11,14 +11,11 @@ pip3 install --upgrade pip
   
 # 使用 pip3 安装 scapy 和 netfilterqueue  
 pip3 install scapy netfilterqueue  
-  
-# 使用 nohup 运行后台进程 
-nohup python3 geneva.py -q 100 -w 17 &  
-nohup python3 geneva.py -q 101 -w 4 &  
-  
-# 配置 iptables 规则以将特定 TCP 流量发送到 NFQUEUE  
-iptables -I OUTPUT -p tcp --sport 80 --tcp-flags SYN,RST,ACK,FIN,PSH SYN,ACK -j NFQUEUE --queue-num 100  
-iptables -I OUTPUT -p tcp --sport 443 --tcp-flags SYN,RST,ACK,FIN,PSH SYN,ACK -j NFQUEUE --queue-num 101  
-  
+
+iptables   -I OUTPUT -p tcp --sport 443 -j NFQUEUE --queue-num 100
+iptables   -I OUTPUT -p tcp --sport 80 -j NFQUEUE --queue-num 100
+
+nohup python3 gen.py -q 100 -w 1 -s 7 -c 0 -n 7 &
+
 # 验证 geneva.py 是否正在运行  
 echo "geneva.py install finish, please verify it with [ps -ef|grep geneva]"
