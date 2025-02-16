@@ -14,16 +14,18 @@ sed -i "s/#Port 22/Port ${SSHPORT}/" /etc/ssh/sshd_config
 
 systemctl restart firewalld
 
-firewall-cmd --zone=public --add-port=$SSHPORT/tcp --permanent
-firewall-cmd --reload
-sudo dnf install policycoreutils-python-utils
-semanage port -a -t ssh_port_t -p tcp $SSHPORT
-systemctl restart sshd.service
+firewall-cmd --zone=public --add-port=$SSHPORT/tcp --permanent && firewall-cmd --reload && yum -y install policycoreutils-python && semanage port -a -t ssh_port_t -p tcp $SSHPORT && systemctl restart sshd.service
 
-#Update System
-sudo dnf update
+#upgrade SVN version
+yum remove subverson
+sudo tee /etc/yum.repos.d/wandisco-svn.repo <<-'EOF'
+[WandiscoSVN]
+name=Wandisco SVN Repo
+baseurl=http://opensource.wandisco.com/centos/7/svn-1.8/RPMS/$basearch/
+enabled=1
+gpgcheck=0
+EOF
+yum clean all && yum install subversion -y && svn --version
 
-#Install SVN
-sudo dnf remove subversion
-sudo dnf install subversion
-svn --version
+#upgrade yum
+yum update
