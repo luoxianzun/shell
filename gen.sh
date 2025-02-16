@@ -15,7 +15,7 @@ pip3 install scapy netfilterqueue
 iptables   -I OUTPUT -p tcp --sport 443 -j NFQUEUE --queue-num 100
 iptables   -I OUTPUT -p tcp --sport 80 -j NFQUEUE --queue-num 100
 
-nohup python3 gen.py -q 100 -w 1 -s 7 -c 0 -n 7 &
+nohup python3 geneva.py -q 100 -w 1 -s 7 -c 0 -n 7 &
 
 # 验证 geneva.py 是否正在运行  
 echo "geneva.py install finish, please verify it with [ps -ef|grep geneva]"
