@@ -35,7 +35,7 @@ fi
 
 # 自动为 www 用户设置 Samba 密码（这里假设密码也是 www）
 # 注意：在生产环境中，应该使用更安全的方式来处理密码
-(echo "www"; echo "www"; echo "www") | smbpasswd -s -a www
+(echo "YD6v3kT0ZNkB8IXV"; echo "YD6v3kT0ZNkB8IXV"; echo "YD6v3kT0ZNkB8IXV") | smbpasswd -s -a www
 
 # 将 www 用户添加到 smbusers 文件中，以便它可以作为网络服务的一部分
 echo 'www = "network service"' >> /etc/samba/smbusers
