@@ -1,6 +1,13 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+
+# 检查是否提供了足够的参数
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <samba_username> <samba_password>"
+    exit 1
+fi
+
+SAMBA_USERNAME=$1
+SAMBA_PASSWORD=$2
 
 # 安装 Samba 和相关客户端工具
 dnf install samba samba-client -y
@@ -33,27 +40,19 @@ if ! command -v smbpasswd &> /dev/null; then
     dnf install samba-common-tools -y
 fi
 
-# 自动为 www 用户设置 Samba 密码（这里假设密码也是 www）
-# 注意：在生产环境中，应该使用更安全的方式来处理密码
-(echo "www"; echo "www"; echo "www") | smbpasswd -s -a www
+# 使用提供的用户名和密码自动设置 Samba 密码
+(echo "$SAMBA_PASSWORD"; echo "$SAMBA_PASSWORD") | smbpasswd -s -a "$SAMBA_USERNAME"
 
-# 将 www 用户添加到 smbusers 文件中，以便它可以作为网络服务的一部分
-echo 'www = "network service"' >> /etc/samba/smbusers
+# 将 Samba 用户添加到 smbusers 文件中（如果需要）
+# 注意：这通常不是必需的，除非你有特定的用户映射需求
+# echo "$SAMBA_USERNAME = \"network service\"" >> /etc/samba/smbusers
 
-# 确保 /etc/rc.d/rc.local 文件存在并可执行，以便在系统启动时运行自定义命令
-if [ ! -x /etc/rc.d/rc.local ]; then
-    chmod +x /etc/rc.d/rc.local
-fi
-
-# 在 rc.local 文件中添加启动 Samba 服务的命令（虽然 systemctl enable 已经做了这一步，但这是为了确保）
-echo 'systemctl start smb nmb' >> /etc/rc.d/rc.local
-
-# 设置 /www/wwwroot 目录的权限
+# 设置 /www/wwwroot 目录的权限（确保 www 用户和组已经存在）
 chown -R www:www /www/wwwroot
 chmod -R 755 /www/wwwroot
 
 # 重启 smb 服务以应用新的配置
 systemctl restart smb
 
-# 输出安装成功的消息
-echo "Samba install and configuration success."
+# 输出安装和配置成功的消息
+echo "Samba install and configuration success for user $SAMBA_USERNAME."
