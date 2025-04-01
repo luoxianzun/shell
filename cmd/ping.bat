@@ -1,0 +1,1 @@
+for /l %D in (2,1,254) do (ping 23.224.13.%D -n 1 && echo 23.224.13.%D>>ok.txt || echo 23.224.13.%D >>no.txt)
