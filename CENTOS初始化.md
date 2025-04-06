@@ -8,6 +8,7 @@ mkdir /www && mount /dev/sdb1 /www && echo "/dev/sdb1              /www         
 wget -O format_and_mount.sh   https://raw.githubusercontent.com/luoxianzun/shell/refs/heads/main/format_and_mount.sh && sudo sh format_and_mount.sh
 
 # 安装宝塔并安装软件，设置防火墙端口
+URL=https://www.aapanel.com/script/install_7.0_en.sh && if [ -f /usr/bin/curl ];then curl -ksSO "$URL" ;else wget --no-check-certificate -O install_7.0_en.sh "$URL";fi;bash install_7.0_en.sh aapanel
 
 # 安装Samba并做好映射
 wget -O samba.sh https://raw.githubusercontent.com/luoxianzun/shell/refs/heads/main/centos9/samba.sh && sudo sh samba.sh www SAMBAPassword
