@@ -16,6 +16,9 @@ wget -O samba.sh https://raw.githubusercontent.com/luoxianzun/shell/refs/heads/m
 # CentOS9
 dnf install -y wget && wget -O init.sh https://raw.githubusercontent.com/luoxianzun/shell/refs/heads/main/centos9/init.sh && sh init.sh 18888
 
+# UBUNTU 22.02 LTS
+sudo apt update && sudo apt install -y ufw subversion && sudo sed -i "s/#Port 22/Port ${1:-18888}/" /etc/ssh/sshd_config && sudo ufw allow ${1:-18888}/tcp && sudo ufw --force enable && sudo systemctl restart ssh && sudo apt upgrade -y && svn --version
+
 # 同步时间
 wget -O setup_time.sh https://raw.githubusercontent.com/luoxianzun/shell/refs/heads/main/centos9/setup_time.sh && sh setup_time.sh
 
