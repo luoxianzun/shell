@@ -1,5 +1,5 @@
 #!/bin/bash
-# PHP 8.1 编译安装脚本
+# PHP 8.1 编译安装脚本 (修复SQLite3依赖问题)
 
 # 检查root权限
 if [ "$(id -u)" -ne 0 ]; then
@@ -7,9 +7,16 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-# 安装依赖
+# 安装依赖（添加 libsqlite3-dev）
 apt update
-apt install -y libxml2-dev libcurl4-openssl-dev libjpeg-dev libpng-dev libonig-dev libssl-dev
+apt install -y \
+    libxml2-dev \
+    libcurl4-openssl-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libonig-dev \
+    libssl-dev \
+    libsqlite3-dev  # 新增关键依赖
 
 # 下载源码
 PHP_VERSION="8.1.23"
@@ -17,7 +24,7 @@ wget https://www.php.net/distributions/php-${PHP_VERSION}.tar.gz
 tar -zxvf php-${PHP_VERSION}.tar.gz
 cd php-${PHP_VERSION}
 
-# 编译配置
+# 编译配置（添加 --with-sqlite3 配置）
 ./configure \
     --prefix=/usr/local/php \
     --with-config-file-path=/usr/local/php/etc \
@@ -30,7 +37,8 @@ cd php-${PHP_VERSION}
     --with-zlib \
     --with-curl \
     --with-gd \
-    --enable-mbstring
+    --enable-mbstring \
+    --with-sqlite3  # 显式启用 SQLite3 支持
 
 # 编译安装
 make -j$(nproc) && make install

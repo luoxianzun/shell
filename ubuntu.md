@@ -10,7 +10,7 @@ sudo bash php_install.sh
 sudo bash redis_install.sh
 sudo bash test_site.sh
 
-wget -O mysql_install.sh https://raw.githubusercontent.com/luoxianzun/shell/refs/heads/main/ubuntu/mysql_install.sh && sh mysql_install.sh
+wget -O php_install.sh https://raw.githubusercontent.com/luoxianzun/shell/refs/heads/main/ubuntu/php_install.sh && sh php_install.sh
 
 # 配置数据库
 wget -O db_setup.sh https://raw.githubusercontent.com/luoxianzun/shell/refs/heads/main/ubuntu/db_setup.sh && sh db_setup.sh
