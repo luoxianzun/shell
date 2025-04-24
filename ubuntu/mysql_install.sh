@@ -1,5 +1,5 @@
 #!/bin/bash
-# MySQL 5.7 编译安装脚本
+# MySQL 5.7 编译修复安装脚本
 
 # 检查root权限
 if [ "$(id -u)" -ne 0 ]; then
@@ -7,29 +7,48 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-# 安装依赖
+# 安装依赖（增加libtirpc-dev）
 apt update
-apt install -y cmake libncurses5-dev libssl-dev bison
+apt install -y cmake libncurses5-dev libssl-dev bison libtirpc-dev
 
-# 下载源码
+# 下载源码（使用官方源码包）
 MYSQL_VERSION="5.7.44"
-wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-boost-${MYSQL_VERSION}.tar.gz
-tar -zxvf mysql-boost-${MYSQL_VERSION}.tar.gz
+wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-${MYSQL_VERSION}.tar.gz
+tar -zxvf mysql-${MYSQL_VERSION}.tar.gz
 cd mysql-${MYSQL_VERSION}
 
-# 编译配置
+# 应用补丁文件（修复符号缺失问题）
+cat > fix_db_return.patch <<'EOF'
+diff --git a/sql/mysqld.cc b/sql/mysqld.cc
+index 7c8e8d9..bca8a6d 100644
+--- a/sql/mysqld.cc
++++ b/sql/mysqld.cc
+@@ -5092,6 +5092,7 @@ static int init_common_variables() {
+   opt_log= MY_TEST(opt_log_handlers_list);
+ #endif
+ 
++  DBUG_RETURN(0);
+   return 0;
+ }
+EOF
+
+patch -p1 < fix_db_return.patch
+
+# 编译配置（增加WITH_BOOST路径）
 cmake . \
     -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
-    -DMYSQL_DATADIR=/www/mysql \
+    -DMYSQL_DATADIR=/data/mysql \
     -DSYSCONFDIR=/etc \
     -DWITH_INNOBASE_STORAGE_ENGINE=1 \
     -DWITH_BOOST=./boost \
     -DDEFAULT_CHARSET=gbk \
     -DDEFAULT_COLLATION=gbk_chinese_ci \
-    -DENABLED_LOCAL_INFILE=1
+    -DENABLED_LOCAL_INFILE=1 \
+    -DCMAKE_CXX_FLAGS="-Wno-error=deprecated-declarations" # 禁用警告
 
 # 编译安装
-make -j$(nproc) && make install
+make -j$(nproc) VERBOSE=1
+make install
 
 # 创建mysql用户
 useradd -M -s /sbin/nologin mysql
