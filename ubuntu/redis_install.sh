@@ -61,7 +61,7 @@ systemctl enable --now redis
 # 安装PHP Redis扩展
 apt install -y php-dev
 pecl install redis
-echo "extension=redis.so" >> /usr/local/php/etc/php.ini
+echo "extension=redis.so" >> /www/server/php/81/etc/php.ini
 systemctl restart php-fpm
 
 echo "Redis 安装完成！验证命令：redis-cli ping"
